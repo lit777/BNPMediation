@@ -1,3 +1,25 @@
+#' Posterior Means and 95\% C.I.s of the NIE, NDE and TE
+#' 
+#' Obtain posterior means and credible intervals of the effects.
+#' @param obj1 The fitted model of the observed data under Z=1 from DPdensity
+#' @param obj0 The fitted model of the observed data under Z=0 from Dpdensity
+#' @param q A dimension of the observed data, i.e., number of covariates plus 2
+#' @param NN Number of samples drawn (for each iteration) from the joint distribution of the mediator and the covariates. Default is 10.
+#' @param n1 Number of observations under Z=1
+#' @param n0 Number of observations under Z=0
+#' @param extra.thin Giving the extra thinning interval
+#' @return ENIE Posterior mean of the NIE
+#' @return ENDE Posterior mean of the NDE
+#' @return ETE Posterior mean of the TE
+#' @return IE.c.i 95\% C.I. of the NIE
+#' @return DE.c.i 95\% C.I. of the NDE
+#' @return TE.c.i 95\% C.I. of the TE
+#' @return Y11 Posterior samples of Y11
+#' @return Y00 Posterior samples of Y00
+#' @return Y10 Posterior samples of Y10
+#' @export
+
+
 bnpmediation<-function(obj1, obj0, q, NN=10, n1, n0, extra.thin=0){
   
   library(mnormt)
