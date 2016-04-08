@@ -4,7 +4,7 @@
 #' @param obj1 The fitted model of the observed data under Z=1 from DPdensity
 #' @param obj0 The fitted model of the observed data under Z=0 from Dpdensity
 #' @param q A dimension of the observed data, i.e., number of covariates plus 2
-#' @param NN Number of samples drawn (for each iteration) from the joint distribution of the mediator and the covariates. Default is 10.
+#' @param NN Number of samples drawn for each iteration from the joint distribution of the mediator and the covariates. Default is 10.
 #' @param n1 Number of observations under Z=1
 #' @param n0 Number of observations under Z=0
 #' @param extra.thin Giving the extra thinning interval
@@ -25,7 +25,6 @@ bnpmediation<-function(obj1, obj0, q, NN=10, n1, n0, extra.thin=0){
   library(mnormt)
   obj1.dim <- dim(obj1$save.state$randsave)[2]-(q*(q+1)/2+2*q-1)
   obj0.dim <- dim(obj0$save.state$randsave)[2]-(q*(q+1)/2+2*q-1)
-
   Len.MCMC <- 1:dim(obj0$save.state$randsave)[1]
   if(extra.thin!=0){
     Len.MCMC <- Len.MCMC[seq(1, length(Len.MCMC), extra.thin)]
