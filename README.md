@@ -24,3 +24,12 @@ For more details, type
 ```
 help(bnpmediation)
 ```
+
+To obtain posterior samples of the potential outcomes, E[Y1] and E[Y0]:
+```
+OutSamples(fit1, fit0, q=2)
+```
+For more details, type
+```
+help(OutSamples)
+```
