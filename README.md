@@ -1,4 +1,5 @@
 # BNPMediation
+# Bayesian Nonparametric Method for Mediation
 
 To install this package:
 ```
