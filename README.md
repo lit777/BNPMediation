@@ -16,3 +16,12 @@ fit1 <- DPdensity(y=w1,prior=prior,mcmc=mcmc,state=state,status=TRUE, na.action=
 fit0 <- DPdensity(y=w0,prior=prior,mcmc=mcmc,state=state,status=TRUE, na.action=na.omit)
 
 ```
+To obtain the posterior means and credible intervals of the effects:
+```
+bnpmediation(fit1, fit0, q=2, NN = 10, n1, n0, extra.thin = 0)
+
+```
+For more details, run 
+```
+help(bnpmediation)
+```
