@@ -20,7 +20,7 @@ To obtain the posterior means and credible intervals of the effects:
 ```
 bnpmediation(fit1, fit0, q=2, NN = 10, n1, n0, extra.thin = 0)
 ```
-For more details, run 
+For more details, type
 ```
 help(bnpmediation)
 ```
