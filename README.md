@@ -1,5 +1,5 @@
 # BNPMediation
-Bayesian Nonparametric Method for Mediation. The R package for Kim et al. (2016) "A framework for Bayesian nonparametric inference for causal effects of mediation", Biometrics.
+Bayesian Nonparametric Method for Mediation. This package is the software implementation of the methods in Kim et al. (2016) "A framework for Bayesian nonparametric inference for causal effects of mediation", Biometrics.
 
 To install this package:
 ```
