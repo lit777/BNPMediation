@@ -8,7 +8,7 @@ install_github("lit777/BNPMediation")
 library(BNPMediation)
 ```
 Before run the function:
-- Firstly, fit the observed data models for both treatments using DPdensity (from DPpackage).
+- First, fit the observed data models for both treatments using DPdensity (from DPpackage).
 ```
 install_packages("DPpackage")
 library(DPpackage)
