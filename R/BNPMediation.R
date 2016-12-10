@@ -53,7 +53,7 @@ bnpmediation<-function(obj1, obj0, q, NN=10, n1, n0, extra.thin=0){
     unique.prop <- NULL
     for(k in 1:length(unique.val)){
       unique.ind[k] <- which(obj1$save.state$randsave[j,seq(1,obj1.dim,by=(q*(q+1)/2+q))]==unique.val[k])[1]
-      unique.prop[k] <- length(which(fit.a.1$save.state$randsave[j,seq(1,obj1.dim,by=(q*(q+1)/2+q))]==unique.val[k]))/n1
+      unique.prop[k] <- length(which(obj1$save.state$randsave[j,seq(1,obj1.dim,by=(q*(q+1)/2+q))]==unique.val[k]))/n1
     }
     b01 <- NULL
     Weight.num0 <- matrix(nrow=length(unique.val), ncol=n0*NN)
