@@ -46,14 +46,17 @@ bnpmediation<-function(obj1, obj0, q, NN=10, n1, n0, extra.thin=0){
     index <- index + 1   
     mu2 <- sapply(seq(2,obj0.dim, by=(q*(q+1)/2+q)), function(x)  obj0$save.state$randsave[j,x[1]:(x[1]+q-2)])
     sigma22 <- sapply(seq(q+q+1,obj0.dim, by=(q*(q+1)/2+q)), function(x)  obj0$save.state$randsave[j,x[1]:(x[1]+(q-1)*(q)/2-1)][mat(q-1)])
-    joint0 <- do.call("rbind", replicate(NN, data.frame(sapply(1:n0, function(x) rmnorm(1,mu2[,x],matrix(sigma22[,x],q-1,q-1,byrow=T) )))))
-    
+    if(q!=2){
+        joint0 <- do.call("rbind", replicate(NN, data.frame(sapply(1:n0, function(x) rmnorm(1,mu2[,x],matrix(sigma22[,x],q-1,q-1,byrow=T) )))))
+    }else{
+        joint0 <- matrix(replicate(NN, sapply(1:n0, function(x) rnorm(1,mu2[x],sd=sqrt(sigma22[x]) )), simplify="array"), nrow=n0*NN)
+    }
     unique.val <- unique(obj1$save.state$randsave[j,seq(1,obj1.dim,by=(q*(q+1)/2+q))])
     unique.ind <- NULL
     unique.prop <- NULL
     for(k in 1:length(unique.val)){
       unique.ind[k] <- which(obj1$save.state$randsave[j,seq(1,obj1.dim,by=(q*(q+1)/2+q))]==unique.val[k])[1]
-      unique.prop[k] <- length(which(fit.a.1$save.state$randsave[j,seq(1,obj1.dim,by=(q*(q+1)/2+q))]==unique.val[k]))/n1
+      unique.prop[k] <- length(which(obj1$save.state$randsave[j,seq(1,obj1.dim,by=(q*(q+1)/2+q))]==unique.val[k]))/n1
     }
     b01 <- NULL
     Weight.num0 <- matrix(nrow=length(unique.val), ncol=n0*NN)
@@ -67,7 +70,11 @@ bnpmediation<-function(obj1, obj0, q, NN=10, n1, n0, extra.thin=0){
       sigma1<-obj1$save.state$randsave[j,(q*(q+1)/2+q)*k-(q*(q+1)/2+q)+q+1]
       sigma12<-obj1$save.state$randsave[j,(q*(q+1)/2+q)*k-(q*(q+1)/2+q)+((q+2):(2*q))]
       sigma22<-matrix(obj1$save.state$randsave[j,((q*(q+1)/2+q)*k-(q*(q+1)/2+q)+2*q+1):((q*(q+1)/2+q)*k)][mat(q-1)],q-1,q-1,byrow=TRUE)
-      Weight.num0[t.ind,1:(n0*NN)]<-unique.prop[t.ind]*dmnorm(joint0,mu2,sigma22)
+      if(q!=2){
+          Weight.num0[t.ind,1:(n0*NN)]<-unique.prop[t.ind]*dmnorm(joint0,mu2,sigma22)
+      }else{
+          Weight.num0[t.ind,1:(n0*NN)]<-unique.prop[t.ind]*dnorm(joint0,mu2,sd=sqrt(sigma22))
+      }
       b01[t.ind]<-mu1-sigma12%*%solve(sigma22)%*%t(t(mu2))
       B0[t.ind,1:(n0*NN)]<-sigma12%*%solve(sigma22)%*%t(joint0)
     }
