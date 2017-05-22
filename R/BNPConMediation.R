@@ -1,4 +1,4 @@
-#' Posterior Means and 95\% C.I.s of the NIE, NDE and TE
+#' Posterior Means and 95\% C.I.s of the conditional NIE, NDE and TE
 #' 
 #' Obtain posterior means and credible intervals of the effects.
 #' @param obj1 The fitted model of the observed data under Z=1 from DPdensity
@@ -8,6 +8,8 @@
 #' @param n1 Number of observations under Z=1
 #' @param n0 Number of observations under Z=0
 #' @param extra.thin Giving the extra thinning interval
+#' @param cond.values conditional values of the covariates
+#' @param col.values columns orders of the conditional covariates among all covariates
 #' @return ENIE Posterior mean of the NIE
 #' @return ENDE Posterior mean of the NDE
 #' @return ETE Posterior mean of the TE
@@ -20,7 +22,7 @@
 #' @export
 
 
-bnpmediation<-function(obj1, obj0, q, NN=10, n1, n0, extra.thin=0){
+bnpconmediation<-function(obj1, obj0, q, NN=10, n1, n0, extra.thin=0, cond.values=c(45,35), col.values=c(1,2)){
   
   library(mnormt)
   obj1.dim <- dim(obj1$save.state$randsave)[2]-(q*(q+1)/2+2*q-1)
@@ -34,8 +36,8 @@ bnpmediation<-function(obj1, obj0, q, NN=10, n1, n0, extra.thin=0){
   Y11 <- Ysamples$Y1[Len.MCMC]
   Y00 <- Ysamples$Y0[Len.MCMC]
   
-  mat.given.ij <- function(x, y) ifelse(x <= y, (q-1)*(x-1)+y-x*(x-1)/2, (q-1)*(y-1)+x-y*(y-1)/2) 
-  mat <- function(q) outer( 1:q, 1:q, mat.given.ij ) 
+  mat.given.ij <- function(x, y) ifelse(x <= y, (q-1)*(x-1)+y-x*(x-1)/2, (q-1)*(y-1)+x-y*(y-1)/2)
+  mat <- function(q) outer( 1:q, 1:q, mat.given.ij )
   
   pb <- txtProgressBar(min = 0, max = length(Len.MCMC), style = 3)
   
@@ -44,13 +46,16 @@ bnpmediation<-function(obj1, obj0, q, NN=10, n1, n0, extra.thin=0){
   index<-0
   for(j in Len.MCMC){
     index <- index + 1   
-    mu2 <- sapply(seq(2,obj0.dim, by=(q*(q+1)/2+q)), function(x)  obj0$save.state$randsave[j,x[1]:(x[1]+q-2)])
-    sigma22 <- sapply(seq(q+q+1,obj0.dim, by=(q*(q+1)/2+q)), function(x)  obj0$save.state$randsave[j,x[1]:(x[1]+(q-1)*(q)/2-1)][mat(q-1)])
-    if(q!=2){
+    mu2 <- sapply(seq(2,obj0.dim, by=(q*(q+1)/2+q)), function(x)  obj0$save.state$randsave[j,x:(x+q-2)])
+    sigma22 <- sapply(seq(q+q+1,obj0.dim, by=(q*(q+1)/2+q)), function(x)  obj0$save.state$randsave[j,x:(x+(q-1)*(q)/2-1)][mat(q-1)])
+    if(q>2){
         joint0 <- do.call("rbind", replicate(NN, data.frame(sapply(1:n0, function(x) rmnorm(1,mu2[,x],matrix(sigma22[,x],q-1,q-1,byrow=T) )))))
     }else{
-        joint0 <- matrix(replicate(NN, sapply(1:n0, function(x) rnorm(1,mu2[x],sd=sqrt(sigma22[x]) )), simplify="array"), nrow=n0*NN)
+        stop("No covariates in the joint models")
     }
+    joint0 <- t(sapply(1:NN*n0, function(x) replace(joint0[x, ], col.values+1, cond.values)))
+    
+    ### Up to here
     
     unique.val <- unique(obj1$save.state$randsave[j,seq(1,obj1.dim,by=(q*(q+1)/2+q))])
     unique.ind <- NULL
@@ -71,11 +76,7 @@ bnpmediation<-function(obj1, obj0, q, NN=10, n1, n0, extra.thin=0){
       sigma1<-obj1$save.state$randsave[j,(q*(q+1)/2+q)*k-(q*(q+1)/2+q)+q+1]
       sigma12<-obj1$save.state$randsave[j,(q*(q+1)/2+q)*k-(q*(q+1)/2+q)+((q+2):(2*q))]
       sigma22<-matrix(obj1$save.state$randsave[j,((q*(q+1)/2+q)*k-(q*(q+1)/2+q)+2*q+1):((q*(q+1)/2+q)*k)][mat(q-1)],q-1,q-1,byrow=TRUE)
-      if(q!=2){
-          Weight.num0[t.ind,1:(n0*NN)]<-unique.prop[t.ind]*dmnorm(joint0,mu2,sigma22)
-      }else{
-          Weight.num0[t.ind,1:(n0*NN)]<-unique.prop[t.ind]*dnorm(joint0,mu2,sd=sqrt(sigma22))
-      }
+      Weight.num0[t.ind,1:(n0*NN)]<-unique.prop[t.ind]*dmnorm(joint0,mu2,sigma22)
       
       b01[t.ind]<-mu1-sigma12%*%solve(sigma22)%*%t(t(mu2))
       B0[t.ind,1:(n0*NN)]<-sigma12%*%solve(sigma22)%*%t(joint0)
