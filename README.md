@@ -10,7 +10,7 @@ library(BNPMediation)
 Before run the function:
 - First, fit the observed data models for both treatments using DPdensity (from DPpackage).
 ```
-install_packages("DPpackage")
+install.packages("DPpackage")
 library(DPpackage)
 
 fit1 <- DPdensity(y=w1,prior=prior,mcmc=mcmc,state=state,status=TRUE, na.action=na.omit)
