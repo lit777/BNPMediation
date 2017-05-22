@@ -18,7 +18,7 @@ fit0 <- DPdensity(y=w0,prior=prior,mcmc=mcmc,state=state,status=TRUE, na.action=
 ```
 To obtain the posterior means and credible intervals of the effects:
 ```
-bnpmediation(fit1, fit0, q=5, NN = 10, n1, n0, extra.thin = 0)
+model<-bnpmediation(fit1, fit0, q=5, NN = 10, n1, n0, extra.thin = 0)
 ```
 For more details, type
 ```
@@ -26,7 +26,7 @@ help(bnpmediation)
 ```
 To obtain the posterior means and credible intervals of the conditional effects:
 ```
-bnpconmediation(fit1, fit0, q=5, NN=10, n1, n0, extra.thin=0, cond.values=c(x1,x2), col.values=c(1,2))
+model<-bnpconmediation(fit1, fit0, q=5, NN=10, n1, n0, extra.thin=0, cond.values=c(x1,x2), col.values=c(1,2))
 ```
 For more details, type
 ```
@@ -39,4 +39,8 @@ OutSamples(fit1, fit0, q=2)
 For more details, type
 ```
 help(OutSamples)
+```
+To obtain the posterior plots of the effects:
+```
+PlotEffects(model)
 ```
