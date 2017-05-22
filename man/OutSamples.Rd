@@ -23,6 +23,6 @@ TMean The posterior mean of the total effect
 TCI 95\% C.I. of the total effect
 }
 \description{
-Obtain posterior sampels of the outcomes, E[Y1] and E[Y0].
+Obtain posterior samples of the outcomes, E[Y1] and E[Y0].
 }
 
