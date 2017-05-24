@@ -14,7 +14,7 @@ bnpconmediation(obj1, obj0, q, NN = 10, n1, n0, extra.thin = 0,
 
 \item{q}{A dimension of the observed data, i.e., number of covariates plus 2}
 
-\item{NN}{Number of samples drawn for each iteration from the joint distribution of the mediator and the covariates. Default is 10.}
+\item{NN}{Number of samples drawn for each iteration from the joint distribution of the mediator and the covariates. Default is 100.}
 
 \item{n1}{Number of observations under Z=1}
 

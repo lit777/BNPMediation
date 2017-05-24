@@ -4,7 +4,7 @@
 #' @param obj1 The fitted model of the observed data under Z=1 from DPdensity
 #' @param obj0 The fitted model of the observed data under Z=0 from Dpdensity
 #' @param q A dimension of the observed data, i.e., number of covariates plus 2
-#' @param NN Number of samples drawn for each iteration from the joint distribution of the mediator and the covariates. Default is 10.
+#' @param NN Number of samples drawn for each iteration from the joint distribution of the mediator and the covariates. Default is 100.
 #' @param n1 Number of observations under Z=1
 #' @param n0 Number of observations under Z=0
 #' @param extra.thin Giving the extra thinning interval
@@ -25,11 +25,13 @@
 bnpconmediation<-function(obj1, obj0, q, NN=10, n1, n0, extra.thin=0, cond.values=c(45,35), col.values=c(1,2)){
   
   library(mnormt)
+  library(condMVNorm)
+  
   obj1.dim <- dim(obj1$save.state$randsave)[2]-(q*(q+1)/2+2*q-1)
   obj0.dim <- dim(obj0$save.state$randsave)[2]-(q*(q+1)/2+2*q-1)
   Len.MCMC <- 1:dim(obj0$save.state$randsave)[1]
   if(extra.thin!=0){
-    Len.MCMC <- Len.MCMC[seq(1, length(Len.MCMC), extra.thin)]
+    Len.MCMC <- Len.MCMC[seq(extra.thin, length(Len.MCMC), extra.thin)]
   }
   
   
@@ -41,7 +43,9 @@ bnpconmediation<-function(obj1, obj0, q, NN=10, n1, n0, extra.thin=0, cond.value
   Y10<-NULL
   Y11<-NULL
   Y00<-NULL
-  
+
+  joint0 <- matrix(nrow=n0*NN,ncol=q-1)
+  joint1 <- matrix(nrow=n1*NN,ncol=q-1)
   
   index<-0
   for(j in Len.MCMC){
@@ -49,18 +53,21 @@ bnpconmediation<-function(obj1, obj0, q, NN=10, n1, n0, extra.thin=0, cond.value
     mu2 <- sapply(seq(2,obj0.dim, by=(q*(q+1)/2+q)), function(x)  obj0$save.state$randsave[j,x:(x+q-2)])
     sigma22 <- sapply(seq(q+q+1,obj0.dim, by=(q*(q+1)/2+q)), function(x)  obj0$save.state$randsave[j,x:(x+(q-1)*(q)/2-1)][mat(q-1)])
     if(q>2){
-        joint0 <- do.call("rbind", replicate(NN, data.frame(sapply(1:n0, function(x) rmnorm(1,mu2[,x],matrix(sigma22[,x],q-1,q-1,byrow=T) )))))
+        joint0.temp <- do.call("rbind", replicate(NN, data.frame(sapply(1:n0, function(x) rcmvnorm(1, mu2[,x], matrix(sigma22[,x],q-1,q-1,byrow=T), c(1:(q-1))[-(col.values+1)], (col.values+1), cond.values, check.sigma=TRUE,method=c("svd"))))))
     }else{
         stop("No covariates in the joint models")
     }
-    joint0 <- t(sapply(1:NN*n0, function(x) replace(joint0[x, ], col.values+1, cond.values)))
-
+    joint0[,(col.values+1)] <- matrix(cond.values, nrow=n0*NN, ncol=2, byrow=T) 
+    joint0[,-(col.values+1)] <- joint0.temp 
+    
 
     mu2 <- sapply(seq(2,obj1.dim, by=(q*(q+1)/2+q)), function(x)  obj1$save.state$randsave[j,x:(x+q-2)])
     sigma22 <- sapply(seq(q+q+1,obj1.dim, by=(q*(q+1)/2+q)), function(x)  obj1$save.state$randsave[j,x:(x+(q-1)*(q)/2-1)][mat(q-1)])
-    joint1 <- do.call("rbind", replicate(NN, data.frame(sapply(1:n1, function(x) rmnorm(1,mu2[,x],matrix(sigma22[,x],q-1,q-1,byrow=T) )))))
-    joint1 <- t(sapply(1:NN*n1, function(x) replace(joint1[x, ], col.values+1, cond.values)))
-
+    joint1.temp <- do.call("rbind", replicate(NN, data.frame(sapply(1:n1, function(x) rcmvnorm(1, mu2[,x], matrix(sigma22[,x],q-1,q-1,byrow=T), c(1:(q-1))[-(col.values+1)], (col.values+1), cond.values, check.sigma=TRUE,method=c("svd"))))))
+    joint1[,(col.values+1)] <- matrix(cond.values, nrow=n1*NN, ncol=2, byrow=T) 
+    joint1[,-(col.values+1)] <- joint1.temp 
+    
+    
 
 
     unique.val <- unique(obj1$save.state$randsave[j,seq(1,obj1.dim,by=(q*(q+1)/2+q))])

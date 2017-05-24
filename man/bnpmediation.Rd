@@ -4,7 +4,7 @@
 \alias{bnpmediation}
 \title{Posterior Means and 95\% C.I.s of the NIE, NDE and TE}
 \usage{
-bnpmediation(obj1, obj0, q, NN = 10, n1, n0, extra.thin = 0)
+bnpmediation(obj1, obj0, q, NN = 100, n1, n0, extra.thin = 5)
 }
 \arguments{
 \item{obj1}{The fitted model of the observed data under Z=1 from DPdensity}
@@ -13,7 +13,7 @@ bnpmediation(obj1, obj0, q, NN = 10, n1, n0, extra.thin = 0)
 
 \item{q}{A dimension of the observed data, i.e., number of covariates plus 2}
 
-\item{NN}{Number of samples drawn for each iteration from the joint distribution of the mediator and the covariates. Default is 10.}
+\item{NN}{Number of samples drawn for each iteration from the joint distribution of the mediator and the covariates. Default is 100.}
 
 \item{n1}{Number of observations under Z=1}
 
